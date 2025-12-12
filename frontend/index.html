@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker App</title>
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .status { background: #4caf50; color: white; padding: 10px; border-radius: 5px; }
+        .item { background: #f0f0f0; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>TD Docker ASRBD - Valentin VERGULT</h1>
+    <div id="status"></div>
+    <h2>Données de la base de données</h2>
+    <div id="items">
+        <div class="loading">Chargement des items...</div>
+    </div>
+
+    <script>
+        fetch('http://localhost:3000/status')
+            .then(r => r.json())
+            .then(d => {
+                document.getElementById('status').innerHTML = 
+                    `<div class="status">Status API: ${d.status}</div>`;
+            })
+            .catch(err => {
+                document.getElementById('status').innerHTML = 
+                    `<div class="error">Erreur de connexion à l'API</div>`;
+                console.error('Erreur API:', err);
+            });
+
+        fetch('http://localhost:3000/items')
+            .then(r => r.json())
+            .then(items => {
+                if (items.length === 0) {
+                    document.getElementById('items').innerHTML = 
+                        '<div class="loading">Aucun item dans la base de données</div>';
+                } else {
+                    document.getElementById('items').innerHTML = items.map(i => 
+                        `<div class="item">
+                            <strong>${i.title}</strong><br>
+                            <span style="color: #666;">${i.description}</span>
+                        </div>`
+                    ).join('');
+                }
+            })
+            .catch(err => {
+                document.getElementById('items').innerHTML = 
+                    `<div class="error">Erreur lors du chargement des données</div>`;
+                console.error('Erreur items:', err);
+            });
+    </script>
+</body>
+</html>
